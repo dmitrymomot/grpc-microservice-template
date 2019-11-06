@@ -3,6 +3,7 @@ module github.com/dmitrymomot/examplesrv
 go 1.13
 
 require (
+	github.com/TV4/graceful v0.3.4
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-pg/pg/v9 v9.0.1
 	github.com/gocraft/work v0.5.1
