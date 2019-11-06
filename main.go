@@ -15,6 +15,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dmitrymomot/examplesrv/client"
+
 	"github.com/dmitrymomot/examplesrv/jobs"
 	"github.com/dmitrymomot/examplesrv/pb/examplesrv"
 	"github.com/dmitrymomot/examplesrv/service"
@@ -75,7 +77,6 @@ func main() {
 	} else {
 		zlogger, err = zap.NewProduction()
 	}
-	// zlogger, err := zap.NewProduction()
 	if err != nil {
 		stdlog.Fatal("can't init logger", err)
 	}
@@ -201,6 +202,14 @@ func main() {
 		}
 		return nil
 	})
+
+	// Set up a connection to the server.
+	// c, err := e.NewDefaultClient("examplesrv:9200")
+	// if err != nil {
+	// 	log.Fatalf("did not connect: %v", err)
+	// }
+	c := client.Must(client.NewDefaultClient("examplesrv:9200"))
+	defer c.Close()
 
 	router := chi.NewRouter()
 	router.Use(middleware.Recoverer)
