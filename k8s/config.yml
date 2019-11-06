@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: examplesrv-config
+  labels:
+    name: examplesrv-config
+data:
+  GRPC_PORT: ":8888"
+  SRV_NAME: examplesrv
+  PG_HOST: postgres
+  PG_PORT: "5432"
+  PG_DB: pgdb
+  PG_USER: pguser
+  PG_PASSWORD: pgpass

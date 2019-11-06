@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package examplesrv;
+
+// available plugins:
+// import "google/protobuf/wrappers.proto";
+// import "google/api/annotations.proto";
+// import "validate/validate.proto";
+// import "google/protobuf/any.proto";
+
+
+service Service {
+	rpc Call (Req) returns (Resp) {}
+}
+
+message Req {
+    string str = 1 ;
+}
+
+message Resp {
+	string str = 1;
+}
