@@ -1,3 +1,8 @@
+
+# Environment variables
+LATEST_COMMIT := $$(git rev-parse HEAD)
+
+
 .PHONY: help
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -8,6 +13,7 @@ proto: ## Compile protobuf for golang
 		-I$(GOPATH)/src \
 		-I ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate \
 		--go_out=plugins=grpc:. \
+		--twirp_out=. \
 		--validate_out=lang=go:. \
 		pb/**/*.proto
 
@@ -28,11 +34,11 @@ docker: ## Build docker image
 
 .PHONY: deploy
 deploy: ## Deploy pods to kubernetes
-	kubectl apply -f k8s/config.yml -f k8s/deploy.yml
+	kubectl apply -f k8s.yml
 
 .PHONY: down
 down: ## Down pods
-	kubectl delete -f k8s/deploy.yml -f k8s/config.yml
+	kubectl delete -f k8s.yml
 
 .PHONY: reload
 reload: down deploy info ## Reload after app was rebuilt

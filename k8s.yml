@@ -1,0 +1,98 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: examplesrv
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: examplesrv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: examplesrv
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        config.linkerd.io/skip-outbound-ports: "4222,5432,6379"
+        linkerd.io/inject: enabled
+      creationTimestamp: null
+      labels:
+        app: examplesrv
+    spec:
+      serviceAccountName: examplesrv
+      containers:
+        - name: examplesrv
+          image: examplesrv:latest
+          imagePullPolicy: IfNotPresent
+          args: [
+            # "-debug=true",
+            "-app_name='The Awesome App'",
+            "-http_port=8888",
+            "-grpc_port=9200",
+            "-db_host=postgres",
+            "-db_port=5432",
+            "-db_name=pgdb",
+            "-db_user=pguser",
+            "-db_password=pgpass",
+            "-db_pool_size=22",
+            "-redis_host=redis://redis:6379",
+            "-nats_host=nats://nats-cluster:4222",
+            "-nats_queue_subject=examplesrv"
+          ]
+          ports:
+            - containerPort: 9200
+              name: grpc
+            - containerPort: 8888
+              name: http
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: examplesrv
+spec:
+  selector:
+    app: examplesrv
+  clusterIP: None
+  ports:
+    - name: grpc
+      port: 9200
+      targetPort: 9200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: examplesrv-http-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: examplesrv
+  ports:
+    - name: http
+      port: 8888
+      targetPort: 8888
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: examplesrv-grpc-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: examplesrv
+  ports:
+    - name: grpc
+      port: 9201
+      targetPort: 9200
